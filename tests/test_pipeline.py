@@ -21,7 +21,7 @@ class FakeClient:
         return {"code": 200}
 
 
-def test_cover_fetch_failure_falls_back_to_title_only(monkeypatch, tmp_path):
+def test_cover_fetch_or_decode_failure_falls_back_to_title_only(monkeypatch, tmp_path):
     import requests
 
     config = AppConfig(
@@ -33,7 +33,7 @@ def test_cover_fetch_failure_falls_back_to_title_only(monkeypatch, tmp_path):
     pipeline.client = FakeClient()
 
     def fail_fetch(*args, **kwargs):
-        raise requests.HTTPError("not found")
+        raise RuntimeError("unsupported bnc cover")
 
     monkeypatch.setattr("autoporn_ops.pipeline.fetch_and_score", fail_fetch)
     decisions = pipeline.plan()

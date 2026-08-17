@@ -7,7 +7,13 @@ api:
   timeout_seconds: 20
   # dry_run=true 仍会请求搜索、分类列表、封面等读取接口；只拦截上架/重新分类写入接口。
   dry_run: true
-  image_base_url: "https://admin.aipapa.pw/"
+  # 如果接口返回的是完整 CDN 路径，可把 image_base_url 留空；如果返回相对路径则填写图片域名。
+  image_base_url: ""
+  # 某些 .bnc 资源需要与浏览器一致的 Origin/Referer。若仍无法被 Pillow 识别，会自动按标题/标签继续。
+  image_headers:
+    Origin: "https://aipapa-admin.rcyq.net"
+    Referer: "https://aipapa-admin.rcyq.net/"
+    User-Agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36"
 
 selection:
   position: "guochan"

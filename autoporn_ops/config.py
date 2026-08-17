@@ -15,6 +15,7 @@ class ApiConfig:
     timeout_seconds: int = 20
     dry_run: bool = True
     image_base_url: str | None = None
+    image_headers: dict[str, str] = field(default_factory=dict)
 
 
 @dataclass(slots=True)

@@ -46,6 +46,7 @@ class OperationsPipeline:
                         self.config.api.image_base_url,
                         self.config.api.timeout_seconds,
                         retries=self.config.selection.cover_fetch_retries,
+                        headers=self.config.api.image_headers,
                     )
                     cover_score = quality.score
                     if quality.score < self.config.selection.min_cover_score:
