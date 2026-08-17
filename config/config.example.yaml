@@ -1,0 +1,28 @@
+api:
+  base_url: "https://admin.aipapa.pw"
+  authorization_env: "AIPAPA_AUTHORIZATION"
+  timeout_seconds: 20
+  dry_run: true
+  image_base_url: "https://admin.aipapa.pw/"
+
+selection:
+  position: "guochan"
+  page_size: 100
+  max_pages: 1
+  min_cover_score: 45
+  reject_keywords:
+    - "未成年"
+    - "幼女"
+    - "迷奸"
+    - "偷拍"
+    - "重口"
+    - "猎奇"
+    - "包皮垢"
+  section_targets:
+    精选: 10
+    制服诱惑: 5
+
+learning:
+  model_dir: "data/models"
+  review_workbook: "data/review.xlsx"
+  operations_workbook: "data/operations.xlsx"
