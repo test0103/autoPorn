@@ -10,6 +10,7 @@ import yaml
 @dataclass(slots=True)
 class ApiConfig:
     base_url: str
+    authorization: str = ""
     authorization_env: str = "AIPAPA_AUTHORIZATION"
     timeout_seconds: int = 20
     dry_run: bool = True

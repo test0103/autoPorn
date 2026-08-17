@@ -15,7 +15,7 @@ A local-first Python pipeline for content selection, publishing, re-classificati
 
 ## Safety and credentials
 
-Do not hard-code admin tokens. Put the bearer/JWT value in the environment variable named by `api.authorization_env` (default: `AIPAPA_AUTHORIZATION`). The provided YAML uses `dry_run: true`; this prevents network mutations unless `--execute` is passed.
+Put the backend Authorization token in your untracked local YAML file (`api.authorization`). `dry_run: true` still reads live API data for search, section lists and covers, but blocks write/mutation calls unless `--execute` is passed.
 
 ## Quick start
 
@@ -24,11 +24,11 @@ python -m venv .venv
 . .venv/bin/activate
 pip install -e '.[dev]'
 cp config/config.example.yaml config/config.local.yaml
-export AIPAPA_AUTHORIZATION='your-token'
+# edit config/config.local.yaml and set api.authorization first
 content-ops --config config/config.local.yaml
 ```
 
-To execute real publishing and re-classification after auditing the plan:
+The first run reads live API data and writes an Excel plan, but does not publish or re-classify while `dry_run: true`. To execute real publishing and re-classification after auditing the plan:
 
 ```bash
 content-ops --config config/config.local.yaml --execute

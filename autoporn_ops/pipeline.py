@@ -39,7 +39,7 @@ class OperationsPipeline:
             if not reject_reason and title_score < self.config.selection.min_title_score:
                 reject_reason = title_reason
             cover_score = None
-            if not reject_reason and movie.img_x and not self.config.api.dry_run:
+            if not reject_reason and movie.img_x:
                 try:
                     quality = fetch_and_score(movie.img_x, self.config.api.image_base_url, self.config.api.timeout_seconds)
                     cover_score = quality.score
