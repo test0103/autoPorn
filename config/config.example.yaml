@@ -1,0 +1,51 @@
+api:
+  base_url: "https://admin.aipapa.pw"
+  # 直接把后台 Authorization 写入本地配置文件。不要提交 config/config.local.yaml。
+  authorization: "PUT_YOUR_AUTHORIZATION_TOKEN_HERE"
+  # 可选：如果 authorization 为空，可继续从环境变量读取；不需要时留空。
+  authorization_env: ""
+  timeout_seconds: 20
+  # dry_run=true 仍会请求搜索、分类列表、封面等读取接口；只拦截上架/重新分类写入接口。
+  dry_run: true
+  image_base_url: "https://admin.aipapa.pw/"
+
+selection:
+  position: "guochan"
+  page_size: 100
+  max_pages: 1
+  min_cover_score: 45
+  # 封面请求失败时最多重试次数；重试后仍失败则默认只按标题/标签继续处理。
+  cover_fetch_retries: 3
+  # title_only：封面网络失败不拒绝，记录 warning 后继续；reject：封面失败直接拒绝。
+  cover_failure_action: "title_only"
+  min_title_score: 35
+  reject_keywords:
+    - "未成年"
+    - "幼女"
+    - "迷奸"
+    - "偷拍"
+    - "重口"
+    - "猎奇"
+    - "包皮垢"
+  # 可以填父列表，也可以填子列表；脚本会用接口返回的动态列表做匹配。
+  section_targets:
+    精选: 10
+    国产: 20
+    网黄: 8
+    AV: 8
+    乱伦: 3
+    传媒: 8
+    重口味: 0
+    猎奇: 0
+    调教: 5
+  # 只保存运营规则和复核差异，不落地保存接口返回的完整内容库。
+  category_aliases:
+    国产: ["国产", "国语", "大陆", "酒店", "探花", "约炮", "按摩", "足浴"]
+    网黄: ["网红", "网黄", "主播", "直播", "福利姬", "自拍", "原创"]
+    AV: ["AV", "女优", "番号", "日本", "无码", "有码", "中文字幕"]
+    传媒: ["传媒", "麻豆", "天美", "蜜桃", "果冻", "皇家华人", "剧情"]
+
+learning:
+  model_dir: "data/models"
+  review_workbook: "data/review.xlsx"
+  operations_workbook: "data/operations.xlsx"
