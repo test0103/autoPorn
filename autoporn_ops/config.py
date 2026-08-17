@@ -24,6 +24,8 @@ class SelectionConfig:
     min_cover_score: float = 45.0
     reject_keywords: list[str] = field(default_factory=list)
     section_targets: dict[str, int] = field(default_factory=dict)
+    category_aliases: dict[str, list[str]] = field(default_factory=dict)
+    min_title_score: float = 35.0
 
 
 @dataclass(slots=True)

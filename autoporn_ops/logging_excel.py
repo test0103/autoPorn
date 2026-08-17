@@ -7,7 +7,23 @@ from openpyxl import Workbook, load_workbook
 
 from .classifier import Decision
 
-HEADERS = ["movie_id", "title", "tags", "action", "section_id", "section_name", "confidence", "reason", "cover_score"]
+HEADERS = [
+    "movie_id",
+    "title",
+    "tags",
+    "action",
+    "section_id",
+    "section_name",
+    "confidence",
+    "reason",
+    "cover_score",
+    "title_score",
+    "review_action",
+    "review_section",
+    "review_title_click",
+    "review_cover_click",
+    "review_note",
+]
 
 
 def append_decisions(path: str | Path, decisions: Iterable[Decision]) -> None:
@@ -32,6 +48,12 @@ def append_decisions(path: str | Path, decisions: Iterable[Decision]) -> None:
             decision.confidence,
             decision.reason,
             decision.cover_score,
+            decision.title_score,
+            "",
+            "",
+            "",
+            "",
+            "",
         ])
     wb.save(path)
 
@@ -52,9 +74,12 @@ def read_review_training(path: str | Path) -> list[tuple[str, str]]:
         return str(row[column] or "")
 
     for row in ws.iter_rows(min_row=2, values_only=True):
-        approved = cell(row, "approved").lower() in {"1", "true", "yes", "y", "通过"}
+        review_action = cell(row, "review_action") or cell(row, "approved")
+        approved = review_action.lower() in {"1", "true", "yes", "y", "通过", "approve", "keep"}
         text = cell(row, "title") + " " + cell(row, "tags")
-        section = cell(row, "correct_section") or cell(row, "section_name")
+        section = cell(row, "review_section") or cell(row, "correct_section") or cell(row, "section_name")
+        title_click = cell(row, "review_title_click")
+        cover_click = cell(row, "review_cover_click")
         if approved and text.strip() and section.strip():
-            rows.append((text, section))
+            rows.append((" ".join([text, title_click, cover_click]).strip(), section))
     return rows

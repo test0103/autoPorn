@@ -15,7 +15,9 @@ class OperationsPipeline:
     def __init__(self, config: AppConfig) -> None:
         self.config = config
         self.client = AdminApiClient(config.api)
-        self.classifier = SectionClassifier(Path(config.learning.model_dir) / "section_classifier.joblib")
+        self.classifier = SectionClassifier(
+            Path(config.learning.model_dir) / "section_classifier.joblib", aliases=config.selection.category_aliases
+        )
 
     def learn_from_review(self) -> int:
         rows = read_review_training(self.config.learning.review_workbook)
@@ -33,6 +35,9 @@ class OperationsPipeline:
             if movie.is_add:
                 continue
             reject_reason = should_reject(movie, self.config.selection.reject_keywords)
+            title_score, title_reason = self.classifier.title_appeal_score(movie)
+            if not reject_reason and title_score < self.config.selection.min_title_score:
+                reject_reason = title_reason
             cover_score = None
             if not reject_reason and movie.img_x and not self.config.api.dry_run:
                 try:
@@ -43,18 +48,18 @@ class OperationsPipeline:
                 except requests.RequestException as exc:  # type: ignore[name-defined]
                     reject_reason = f"cover-fetch-failed:{exc.__class__.__name__}"
             if reject_reason:
-                decisions.append(Decision(movie, "reject", None, 1.0, reject_reason, cover_score))
+                decisions.append(Decision(movie, "reject", None, 1.0, reject_reason, cover_score, title_score))
                 continue
             candidates = [s for s in sections if s.name in remaining or s.module_name in remaining or s.sub_module_name in remaining]
             section, confidence, reason = self.classifier.choose_section(movie, candidates or sections)
             if section and remaining:
                 key = section.name if section.name in remaining else section.module_name if section.module_name in remaining else section.sub_module_name
                 if key in remaining and remaining[key] <= 0:
-                    decisions.append(Decision(movie, "skip", section, confidence, "target-filled", cover_score))
+                    decisions.append(Decision(movie, "skip", section, confidence, "target-filled", cover_score, title_score))
                     continue
                 if key in remaining:
                     remaining[key] -= 1
-            decisions.append(Decision(movie, "publish_and_classify", section, confidence, reason, cover_score))
+            decisions.append(Decision(movie, "publish_and_classify", section, confidence, reason + ";" + title_reason, cover_score, title_score))
         return decisions
 
     def execute(self, decisions: list[Decision]) -> None:
