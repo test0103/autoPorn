@@ -14,6 +14,10 @@ selection:
   page_size: 100
   max_pages: 1
   min_cover_score: 45
+  # 封面请求失败时最多重试次数；重试后仍失败则默认只按标题/标签继续处理。
+  cover_fetch_retries: 3
+  # title_only：封面网络失败不拒绝，记录 warning 后继续；reject：封面失败直接拒绝。
+  cover_failure_action: "title_only"
   min_title_score: 35
   reject_keywords:
     - "未成年"

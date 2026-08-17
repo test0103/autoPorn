@@ -43,8 +43,16 @@ def score_image_bytes(content: bytes) -> CoverQuality:
         return CoverQuality(max(0, min(100, score)), ";".join(reasons))
 
 
-def fetch_and_score(path: str, base_url: str | None, timeout: int) -> CoverQuality:
+def fetch_and_score(path: str, base_url: str | None, timeout: int, retries: int = 3) -> CoverQuality:
     url = urljoin((base_url or "").rstrip("/") + "/", path)
-    response = requests.get(url, timeout=timeout)
-    response.raise_for_status()
-    return score_image_bytes(response.content)
+    last_error: requests.RequestException | None = None
+    for _ in range(max(1, retries)):
+        try:
+            response = requests.get(url, timeout=timeout)
+            response.raise_for_status()
+            return score_image_bytes(response.content)
+        except requests.RequestException as exc:
+            last_error = exc
+    if last_error is not None:
+        raise last_error
+    raise RuntimeError("cover fetch failed without a requests error")

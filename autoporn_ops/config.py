@@ -23,6 +23,8 @@ class SelectionConfig:
     page_size: int = 100
     max_pages: int = 1
     min_cover_score: float = 45.0
+    cover_fetch_retries: int = 3
+    cover_failure_action: str = "title_only"
     reject_keywords: list[str] = field(default_factory=list)
     section_targets: dict[str, int] = field(default_factory=dict)
     category_aliases: dict[str, list[str]] = field(default_factory=dict)

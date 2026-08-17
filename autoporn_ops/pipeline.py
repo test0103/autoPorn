@@ -41,12 +41,21 @@ class OperationsPipeline:
             cover_score = None
             if not reject_reason and movie.img_x:
                 try:
-                    quality = fetch_and_score(movie.img_x, self.config.api.image_base_url, self.config.api.timeout_seconds)
+                    quality = fetch_and_score(
+                        movie.img_x,
+                        self.config.api.image_base_url,
+                        self.config.api.timeout_seconds,
+                        retries=self.config.selection.cover_fetch_retries,
+                    )
                     cover_score = quality.score
                     if quality.score < self.config.selection.min_cover_score:
                         reject_reason = "low-cover-quality:" + quality.reason
-                except requests.RequestException as exc:  # type: ignore[name-defined]
-                    reject_reason = f"cover-fetch-failed:{exc.__class__.__name__}"
+                except (requests.RequestException, RuntimeError) as exc:
+                    cover_warning = f"cover-fetch-failed:{exc.__class__.__name__}"
+                    if self.config.selection.cover_failure_action == "reject":
+                        reject_reason = cover_warning
+                    else:
+                        title_reason = title_reason + ";" + cover_warning + ";title-only"
             if reject_reason:
                 decisions.append(Decision(movie, "reject", None, 1.0, reject_reason, cover_score, title_score))
                 continue

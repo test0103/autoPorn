@@ -15,7 +15,7 @@ A local-first Python pipeline for content selection, publishing, re-classificati
 
 ## Safety and credentials
 
-Put the backend Authorization token in your untracked local YAML file (`api.authorization`). `dry_run: true` still reads live API data for search, section lists and covers, but blocks write/mutation calls unless `--execute` is passed.
+Put the backend Authorization token in your untracked local YAML file (`api.authorization`). `dry_run: true` still reads live API data for search, section lists and covers, but blocks write/mutation calls unless `--execute` is passed. Cover fetch failures are retried and, by default, downgrade to title/tag-only planning instead of rejecting the item.
 
 ## Quick start
 
@@ -28,7 +28,7 @@ cp config/config.example.yaml config/config.local.yaml
 content-ops --config config/config.local.yaml
 ```
 
-The first run reads live API data and writes an Excel plan, but does not publish or re-classify while `dry_run: true`. To execute real publishing and re-classification after auditing the plan:
+The first run reads live API data and writes an Excel plan, but does not publish or re-classify while `dry_run: true`. If a cover URL keeps failing, the row stays eligible based on title/tag classification and the reason contains `cover-fetch-failed` plus `title-only`. To execute real publishing and re-classification after auditing the plan:
 
 ```bash
 content-ops --config config/config.local.yaml --execute
